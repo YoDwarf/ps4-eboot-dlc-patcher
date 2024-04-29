@@ -386,66 +386,76 @@ internal class Program
         }
         else
         {
-            Ps4ModuleLoader.Relocation? libKernelRelocation;
-            libKernelRelocation = binary.Relocations.FirstOrDefault(x => x.SYMBOL is not null && LibkernelNids.libkernelNids.Any(y => x.SYMBOL.StartsWith(y)));
-
-            if (libKernelRelocation is null)
-            { throw new Exception("libKernelNidLength is null"); }
-
-            if (hasImportantAppContentSymbols)
+            try
             {
-                var libSceAppContentInitializeRelocation = binary.Relocations.FirstOrDefault(x => x.SYMBOL is not null && x.SYMBOL.StartsWith(Ps4ModuleLoader.Utils.CalculateNidForSymbol("sceAppContentInitialize")));
-                if (libSceAppContentInitializeRelocation is null)
-                { throw new Exception("sceAppContentInitialize not found"); }
+                Ps4ModuleLoader.Relocation? libKernelRelocation;
+                libKernelRelocation = binary.Relocations.FirstOrDefault(x => x.SYMBOL is not null && LibkernelNids.libkernelNids.Any(y => x.SYMBOL.StartsWith(y)));
 
-                // its probably okay if libkernel is shorter (with extra null bytes) just not the other way around
-                if (libSceAppContentInitializeRelocation.SYMBOL!.Length >= libKernelRelocation.SYMBOL!.Length) // ! -> we're checking for null in the linq query
+                if (libKernelRelocation is null)
+                { throw new Exception("libKernelNidLength is null"); }
+
+                List<(ulong offset, byte[] newBytes, string description)> temp_patches = new();
+                if (hasImportantAppContentSymbols)
                 {
-                    // find symbol cause that contains the file offset
-                    var libSceAppContentInitializeNidFileOffset = binary.Symbols.First(x => x.Value!.NID == libSceAppContentInitializeRelocation.SYMBOL).Value!.NID_FILE_ADDRESS;
+                    var libSceAppContentInitializeRelocation = binary.Relocations.FirstOrDefault(x => x.SYMBOL is not null && x.SYMBOL.StartsWith(Ps4ModuleLoader.Utils.CalculateNidForSymbol("sceAppContentInitialize")));
+                    if (libSceAppContentInitializeRelocation is null)
+                    { throw new Exception("sceAppContentInitialize not found"); }
 
-                    // patch nid to sceKernelLoadStartModule
-                    var newBytes = new byte[libSceAppContentInitializeRelocation.SYMBOL.Length];
+                    // its probably okay if libkernel is shorter (with extra null bytes) just not the other way around
+                    if (libSceAppContentInitializeRelocation.SYMBOL!.Length >= libKernelRelocation.SYMBOL!.Length) // ! -> we're checking for null in the linq query
+                    {
+                        // find symbol cause that contains the file offset
+                        var libSceAppContentInitializeNidFileOffset = binary.Symbols.First(x => x.Value!.NID == libSceAppContentInitializeRelocation.SYMBOL).Value!.NID_FILE_ADDRESS;
 
-                    var loadStartModuleNid = Ps4ModuleLoader.Utils.CalculateNidForSymbol("sceKernelLoadStartModule");
-                    Encoding.ASCII.GetBytes(loadStartModuleNid, newBytes);
-                    // copy from first # to end
-                    string libKernelLidMid = libKernelRelocation.SYMBOL.Substring(libKernelRelocation.SYMBOL.IndexOf('#'));
-                    Encoding.ASCII.GetBytes(libKernelLidMid, 0, libKernelLidMid.Length, newBytes, loadStartModuleNid.Length);
+                        // patch nid to sceKernelLoadStartModule
+                        var newBytes = new byte[libSceAppContentInitializeRelocation.SYMBOL.Length];
 
-                    var reencoded = Encoding.ASCII.GetString(newBytes);
+                        var loadStartModuleNid = Ps4ModuleLoader.Utils.CalculateNidForSymbol("sceKernelLoadStartModule");
+                        Encoding.ASCII.GetBytes(loadStartModuleNid, newBytes);
+                        // copy from first # to end
+                        string libKernelLidMid = libKernelRelocation.SYMBOL.Substring(libKernelRelocation.SYMBOL.IndexOf('#'));
+                        Encoding.ASCII.GetBytes(libKernelLidMid, 0, libKernelLidMid.Length, newBytes, loadStartModuleNid.Length);
 
-                    Patches.Add((libSceAppContentInitializeNidFileOffset, newBytes, "sceAppContentInitialize -> sceKernelLoadStartModule"));
-                    sceKernelLoadStartModuleMemOffset = libSceAppContentInitializeRelocation.REAL_FUNCTION_ADDRESS;
+                        var reencoded = Encoding.ASCII.GetString(newBytes);
+
+                        temp_patches.Add((libSceAppContentInitializeNidFileOffset, newBytes, "sceAppContentInitialize -> sceKernelLoadStartModule"));
+                        sceKernelLoadStartModuleMemOffset = libSceAppContentInitializeRelocation.REAL_FUNCTION_ADDRESS;
+                    }
                 }
+
+                if (sceKernelLoadStartModuleMemOffset is null && hasImportantEntitlementAccessRelocations)
+                {
+                    var libSceNpEntitlementAccessInitializeRelocation = binary.Relocations.FirstOrDefault(x => x.SYMBOL is not null && x.SYMBOL.StartsWith(Ps4ModuleLoader.Utils.CalculateNidForSymbol("sceNpEntitlementAccessInitialize")));
+                    if (libSceNpEntitlementAccessInitializeRelocation is null)
+                    { throw new Exception("sceNpEntitlementAccessInitialize not found"); }
+
+                    // its probably okay if libkernel is shorter (with extra null bytes) just not the other way around
+                    if (libSceNpEntitlementAccessInitializeRelocation.SYMBOL!.Length >= libKernelRelocation.SYMBOL!.Length) // ! -> we're checking for null in the linq query
+                    {
+                        // find symbol cause that contains the file offset
+                        var libSceNpEntitlementAccessInitializeNidFileOffset = binary.Symbols.First(x => x.Value!.NID == libSceNpEntitlementAccessInitializeRelocation.SYMBOL).Value!.NID_FILE_ADDRESS;
+
+                        // patch nid to sceKernelLoadStartModule
+                        var newBytes = new byte[libSceNpEntitlementAccessInitializeRelocation.SYMBOL.Length];
+
+                        var loadStartModuleNid = Ps4ModuleLoader.Utils.CalculateNidForSymbol("sceKernelLoadStartModule");
+                        Encoding.ASCII.GetBytes(loadStartModuleNid, newBytes);
+                        // copy from first # to end
+                        string libKernelLidMid = libKernelRelocation.SYMBOL.Substring(libKernelRelocation.SYMBOL.IndexOf('#'));
+                        Encoding.ASCII.GetBytes(libKernelLidMid, 0, libKernelLidMid.Length, newBytes, loadStartModuleNid.Length);
+
+                        var reencoded = Encoding.ASCII.GetString(newBytes);
+
+                        temp_patches.Add((libSceNpEntitlementAccessInitializeNidFileOffset, newBytes, "sceNpEntitlementAccessInitialize -> sceKernelLoadStartModule"));
+                        sceKernelLoadStartModuleMemOffset = libSceNpEntitlementAccessInitializeRelocation.REAL_FUNCTION_ADDRESS;
+                    }
+                }
+                Patches.AddRange(temp_patches);
             }
-
-            if (sceKernelLoadStartModuleMemOffset is null && hasImportantEntitlementAccessRelocations)
+            catch (System.Exception ex)
             {
-                var libSceNpEntitlementAccessInitializeRelocation = binary.Relocations.FirstOrDefault(x => x.SYMBOL is not null && x.SYMBOL.StartsWith(Ps4ModuleLoader.Utils.CalculateNidForSymbol("sceNpEntitlementAccessInitialize")));
-                if (libSceNpEntitlementAccessInitializeRelocation is null)
-                { throw new Exception("sceNpEntitlementAccessInitialize not found"); }
-
-                // its probably okay if libkernel is shorter (with extra null bytes) just not the other way around
-                if (libSceNpEntitlementAccessInitializeRelocation.SYMBOL!.Length >= libKernelRelocation.SYMBOL!.Length) // ! -> we're checking for null in the linq query
-                {
-                    // find symbol cause that contains the file offset
-                    var libSceNpEntitlementAccessInitializeNidFileOffset = binary.Symbols.First(x => x.Value!.NID == libSceNpEntitlementAccessInitializeRelocation.SYMBOL).Value!.NID_FILE_ADDRESS;
-
-                    // patch nid to sceKernelLoadStartModule
-                    var newBytes = new byte[libSceNpEntitlementAccessInitializeRelocation.SYMBOL.Length];
-
-                    var loadStartModuleNid = Ps4ModuleLoader.Utils.CalculateNidForSymbol("sceKernelLoadStartModule");
-                    Encoding.ASCII.GetBytes(loadStartModuleNid, newBytes);
-                    // copy from first # to end
-                    string libKernelLidMid = libKernelRelocation.SYMBOL.Substring(libKernelRelocation.SYMBOL.IndexOf('#'));
-                    Encoding.ASCII.GetBytes(libKernelLidMid, 0, libKernelLidMid.Length, newBytes, loadStartModuleNid.Length);
-
-                    var reencoded = Encoding.ASCII.GetString(newBytes);
-
-                    Patches.Add((libSceNpEntitlementAccessInitializeNidFileOffset, newBytes, "sceNpEntitlementAccessInitialize -> sceKernelLoadStartModule"));
-                    sceKernelLoadStartModuleMemOffset = libSceNpEntitlementAccessInitializeRelocation.REAL_FUNCTION_ADDRESS;
-                }
+                ConsoleUi.LogWarning($"Prx loading is not possible: {ex.Message}");
+                sceKernelLoadStartModuleMemOffset = null;
             }
         }
 
