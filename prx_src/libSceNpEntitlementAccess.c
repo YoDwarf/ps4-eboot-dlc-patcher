@@ -1,9 +1,10 @@
 #include "common.h"
 
-int32_t sceNpEntitlementAccessAbortRequest(int64_t requestId) { return SCE_OK; }
-int32_t sceNpEntitlementAccessDeleteRequest(int64_t requestId) { return SCE_OK; }
+int32_t sceNpEntitlementAccessAbortRequest(int64_t requestId) { sceKernelUsleep(10); return SCE_OK; }
+int32_t sceNpEntitlementAccessDeleteRequest(int64_t requestId) { sceKernelUsleep(10); return SCE_OK; }
 int32_t sceNpEntitlementAccessGenerateTransactionId(SceNpEntitlementAccessTransactionId *transactionId)
 {
+	sceKernelUsleep(10);
 	Logf_if_enabled("[dlcldr] sceNpEntitlementAccessGenerateTransactionId called");
 	if (transactionId == NULL)
 	{
@@ -21,6 +22,7 @@ int32_t sceNpEntitlementAccessGetAddcontEntitlementInfo(
 	const SceNpUnifiedEntitlementLabel *entitlementLabel,
 	SceNpEntitlementAccessAddcontEntitlementInfo *info)
 {
+	sceKernelUsleep(10);
 	// results from the real function
 	// returns SCE_NP_ENTITLEMENT_ACCESS_ERROR_NO_ENTITLEMENT for unknown entitlementlabel
 	// returns SCE_NP_ENTITLEMENT_ACCESS_ERROR_PARAMETER is info is null, it checks this before the entitlementlabel
@@ -54,6 +56,7 @@ int32_t sceNpEntitlementAccessGetAddcontEntitlementInfo(
 // so this could be ignored
 int32_t sceNpEntitlementAccessGetAddcontEntitlementInfoIndividual()
 {
+	sceKernelUsleep(10);
 	// i couldnt figure out what this function is for
 
 	// ida:
@@ -85,6 +88,7 @@ int32_t sceNpEntitlementAccessGetAddcontEntitlementInfoList(
 	uint32_t listNum,
 	uint32_t *hitNum)
 {
+	sceKernelUsleep(10);
 	// real function returns SCE_OK even if list is null
 	// returns SCE_NP_ENTITLEMENT_ACCESS_ERROR_PARAMETER if serviceLabel is unknown
 
@@ -125,6 +129,7 @@ int32_t sceNpEntitlementAccessGetEntitlementKey(
 	const SceNpUnifiedEntitlementLabel *entitlementLabel,
 	SceNpEntitlementAccessEntitlementKey *key)
 {
+	sceKernelUsleep(10);
 	// returns SCE_NP_ENTITLEMENT_ACCESS_ERROR_PARAMETER if key or entitlementLabel is null
 	// returns SCE_NP_ENTITLEMENT_ACCESS_ERROR_NO_ENTITLEMENT if entitlementLabel is unknown
 	
@@ -152,6 +157,7 @@ int32_t sceNpEntitlementAccessGetEntitlementKey(
 // so this could be ignored
 int32_t sceNpEntitlementAccessGetGameTrialsFlag()
 {
+	sceKernelUsleep(10);
 	// this isn't even part of the lib on 4.03 so i have no info
 	// i got PRX_NOT_RESOLVED_FUNCTION
 
@@ -162,6 +168,7 @@ int32_t sceNpEntitlementAccessGetGameTrialsFlag()
 int32_t sceNpEntitlementAccessGetSkuFlag(
 	SceNpEntitlementAccessSkuFlag *skuFlag)
 {
+	sceKernelUsleep(10);
 	if (skuFlag == NULL)
 	{
 		Log_if_enabled("[dlcldr] sceNpEntitlementAccessGetSkuFlag: skuFlag is null");
@@ -178,6 +185,7 @@ int32_t sceNpEntitlementAccessInitialize(
 	const SceNpEntitlementAccessInitParam *initParam,
 	SceNpEntitlementAccessBootParam *bootParam)
 {
+	sceKernelUsleep(10);
 	Log_if_enabled("[dlcldr] sceNpEntitlementAccessInitialize called");
 	return SCE_OK;
 }
@@ -188,6 +196,7 @@ int32_t sceNpEntitlementAccessRequestConsumableEntitlementInfo(
 	const SceNpUnifiedEntitlementLabel *entitlementLabel,
 	int64_t *requestId)
 {
+	sceKernelUsleep(10);
 	// parameters assumed.
 
 	// ida:
@@ -209,6 +218,7 @@ int32_t sceNpEntitlementAccessPollConsumableEntitlementInfo(
 	int32_t *pResult,
 	int32_t *useLimit)
 {
+	sceKernelUsleep(10);
 	// parameters assumed.
 	
 	// ida:
@@ -236,6 +246,7 @@ int32_t sceNpEntitlementAccessRequestConsumeEntitlement(
 	int64_t *requestId
 )
 {
+	sceKernelUsleep(10);
 	// parameters assumed.
 
 	// ida:
@@ -261,6 +272,7 @@ int32_t sceNpEntitlementAccessRequestConsumeUnifiedEntitlement(
 	int32_t useCount,
 	int64_t *requestId)
 {
+	sceKernelUsleep(10);
 	// returns ok even offline
 
 	if (requestId == NULL)
@@ -280,6 +292,7 @@ int32_t sceNpEntitlementAccessPollConsumeEntitlement(
 	int32_t *pResult,
 	int32_t *useLimit)
 {
+	sceKernelUsleep(10);
 	// returns SCE_NP_ENTITLEMENT_ACCESS_ERROR_TITLE_TOKEN no matter what i did
 	// this is not for proper dlc, its for consumables or subscriptions and we dont care about that
 
@@ -294,6 +307,7 @@ int32_t sceNpEntitlementAccessRequestServiceEntitlementInfo(
 	const SceNpServiceEntitlementLabel *entitlementLabel,
 	int64_t *requestId)
 {
+	sceKernelUsleep(10);
 	if (requestId == NULL)
 	{
 		Log_if_enabled("[dlcldr] sceNpEntitlementAccessRequestServiceEntitlementInfo: requestId is null");
@@ -311,6 +325,7 @@ int32_t sceNpEntitlementAccessPollServiceEntitlementInfo(
 	int32_t *pResult,
 	SceNpEntitlementAccessServiceEntitlementInfo *info)
 {
+	sceKernelUsleep(10);
 	*pResult = SCE_NP_ENTITLEMENT_ACCESS_ERROR_TITLE_TOKEN;
 	Log_if_enabled("[dlcldr] sceNpEntitlementAccessPollServiceEntitlementInfo: returning pResult SCE_NP_ENTITLEMENT_ACCESS_ERROR_TITLE_TOKEN, and SCE_NP_ENTITLEMENT_ACCESS_POLL_RET_FINISHED");
 	return SCE_NP_ENTITLEMENT_ACCESS_POLL_RET_FINISHED;
@@ -324,6 +339,7 @@ int32_t sceNpEntitlementAccessRequestServiceEntitlementInfoList(
 	const SceNpEntitlementAccessRequestEntitlementInfoListParam *param,
 	int64_t *requestId)
 {
+	sceKernelUsleep(10);
 	if (param->packageType != SCE_NP_ENTITLEMENT_ACCESS_PACKAGE_TYPE_NONE)
 	{
 		Log_if_enabled("[dlcldr] sceNpEntitlementAccessRequestServiceEntitlementInfoList: packageType is not SCE_NP_ENTITLEMENT_ACCESS_PACKAGE_TYPE_NONE, returning SCE_NP_ENTITLEMENT_ACCESS_ERROR_PARAMETER");
@@ -351,6 +367,7 @@ int32_t sceNpEntitlementAccessPollServiceEntitlementInfoList(
 	int32_t *nextOffset,
 	int32_t *previousOffset)
 {
+	sceKernelUsleep(10);
 	*pResult = SCE_NP_ENTITLEMENT_ACCESS_ERROR_TITLE_TOKEN;
 	Log_if_enabled("[dlcldr] sceNpEntitlementAccessPollServiceEntitlementInfoList: returning pResult SCE_NP_ENTITLEMENT_ACCESS_ERROR_TITLE_TOKEN, and SCE_NP_ENTITLEMENT_ACCESS_POLL_RET_FINISHED");
 	return SCE_NP_ENTITLEMENT_ACCESS_POLL_RET_FINISHED;
@@ -362,6 +379,7 @@ int32_t sceNpEntitlementAccessRequestUnifiedEntitlementInfo(
 	const SceNpUnifiedEntitlementLabel *entitlementLabel,
 	int64_t *requestId)
 {
+	sceKernelUsleep(10);
 	if (requestId == NULL)
 	{
 		Log_if_enabled("[dlcldr] sceNpEntitlementAccessRequestUnifiedEntitlementInfo: requestId is null");
@@ -379,6 +397,7 @@ int32_t sceNpEntitlementAccessPollUnifiedEntitlementInfo(
 	int32_t *pResult,
 	SceNpEntitlementAccessUnifiedEntitlementInfo *info)
 {
+	sceKernelUsleep(10);
 	// real function doesnt touch info
 	*pResult = SCE_NP_ENTITLEMENT_ACCESS_ERROR_TITLE_TOKEN;
 	Log_if_enabled("[dlcldr] sceNpEntitlementAccessPollUnifiedEntitlementInfo: returning pResult SCE_NP_ENTITLEMENT_ACCESS_ERROR_TITLE_TOKEN, and SCE_NP_ENTITLEMENT_ACCESS_POLL_RET_FINISHED");
@@ -393,6 +412,7 @@ int32_t sceNpEntitlementAccessRequestUnifiedEntitlementInfoList(
 	const SceNpEntitlementAccessRequestEntitlementInfoListParam *param,
 	int64_t *requestId)
 {
+	sceKernelUsleep(10);
 	// findings on console with ps servers blocked, but it would probably be the same if they weren't
 	// since its on an old firmware
 
@@ -428,6 +448,7 @@ int32_t sceNpEntitlementAccessPollUnifiedEntitlementInfoList(
 	int32_t *nextOffset,
 	int32_t *previousOffset)
 {
+	sceKernelUsleep(10);
 	// real function doesnt touch hitNum
 	*pResult = SCE_NP_ENTITLEMENT_ACCESS_ERROR_TITLE_TOKEN;
 	Log_if_enabled("[dlcldr] sceNpEntitlementAccessPollUnifiedEntitlementInfoList: returning pResult SCE_NP_ENTITLEMENT_ACCESS_ERROR_TITLE_TOKEN, and SCE_NP_ENTITLEMENT_ACCESS_POLL_RET_FINISHED");
@@ -442,6 +463,7 @@ int32_t sceNpEntitlementAccessRequestConsumeServiceEntitlement(
 	int32_t useCount,
 	int64_t *requestId)
 {
+	sceKernelUsleep(10);
 	if (requestId == NULL)
 	{
 		return SCE_NP_ENTITLEMENT_ACCESS_ERROR_PARAMETER;

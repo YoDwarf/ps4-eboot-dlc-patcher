@@ -4,6 +4,7 @@ int32_t dlcldr_sceAppContentInitialize(
 	SceAppContentInitParam *initParam,
 	SceAppContentBootParam *bootParam)
 {
+	sceKernelUsleep(10);
 	Log_if_enabled("[dlcldr] dlcldr_sceAppContentInitialize called");
 	return 0;
 }
@@ -12,6 +13,7 @@ int32_t dlcldr_sceAppContentAppParamGetInt(
 	SceAppContentAppParamId paramId,
 	int32_t *value)
 {
+	sceKernelUsleep(10);
 	// patch trial flag
 	if (paramId == SCE_APP_CONTENT_APPPARAM_ID_SKU_FLAG)
 	{
@@ -30,6 +32,7 @@ int32_t dlcldr_sceAppContentGetAddcontInfoList(
 	uint32_t listNum,
 	uint32_t *hitNum)
 {
+	sceKernelUsleep(10);
 	Logf_if_enabled("[dlcldr] dlcldr_sceAppContentGetAddcontInfoList called");
 
 	if (listNum == 0 || list == NULL)
@@ -66,6 +69,7 @@ int32_t dlcldr_sceAppContentGetAddcontInfo(
 	const SceNpUnifiedEntitlementLabel *entitlementLabel,
 	SceAppContentAddcontInfo *info)
 {
+	sceKernelUsleep(10);
 	Logf_if_enabled("[dlcldr] dlcldr_sceAppContentGetAddcontInfo called for %s", entitlementLabel->data);
 
 	if (entitlementLabel == NULL || info == NULL)
@@ -96,6 +100,7 @@ int32_t dlcldr_sceAppContentGetEntitlementKey(
 	const SceNpUnifiedEntitlementLabel *entitlementLabel,
 	SceAppContentEntitlementKey *key)
 {
+	sceKernelUsleep(10);
 	Logf_if_enabled("[dlcldr] dlcldr_sceAppContentGetEntitlementKey called for %s", entitlementLabel->data);
 
 	if (entitlementLabel == NULL || key == NULL)
@@ -113,7 +118,6 @@ int32_t dlcldr_sceAppContentGetEntitlementKey(
 		
 		memcpy(key->data, addcontInfo[i].key, SCE_APP_CONTENT_ENTITLEMENT_KEY_SIZE);
 		return 0;
-		
 	}
 
 	Logf_if_enabled("[dlcldr] dlcldr_sceAppContentGetEntitlementKey did not find key for %s, returning SCE_APP_CONTENT_ERROR_DRM_NO_ENTITLEMENT", entitlementLabel->data);
@@ -125,6 +129,7 @@ int32_t dlcldr_sceAppContentAddcontDelete(
 	SceNpServiceLabel serviceLabel,
 	const SceNpUnifiedEntitlementLabel *entitlementLabel)
 {
+	sceKernelUsleep(10);
 	return 0;
 }
 
@@ -133,6 +138,7 @@ int32_t dlcldr_sceAppContentAddcontMount(
 	const SceNpUnifiedEntitlementLabel *entitlementLabel,
 	SceAppContentMountPoint *mountPoint)
 {
+	sceKernelUsleep(10);
 	// checked and originally it returns SCE_APP_CONTENT_ERROR_NOT_FOUND
 	// both if is without data and if the entitlementLabel is not found
 
@@ -166,12 +172,14 @@ int32_t dlcldr_sceAppContentAddcontMount(
 int32_t dlcldr_sceAppContentAddcontUnmount(
 	const SceAppContentMountPoint *mountPoint)
 {
+	sceKernelUsleep(10);
 	return 0;
 }
 
 int32_t dlcldr_sceAppContentGetPftFlag(
 	SceAppContentPftFlag *pftFlag)
 {
+	sceKernelUsleep(10);
 	*pftFlag = SCE_APP_CONTENT_PFT_FLAG_OFF;
 	return 0;
 }
