@@ -45,10 +45,14 @@ jobs:
     - name: Attest Build
       uses: actions/attest-build-provenance@v1
       with:
-        subject-path: ${{ github.workspace }}/prx_src/bin/dlcldr.prx
+        subject-path: |
+          ${{ github.workspace }}/prx_src/bin/dlcldr.prx
+          ${{ github.workspace }}/prx_src/bin/dlcldr_unsigned.elf
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: dlcldr
-        path: ${{ github.workspace }}/prx_src/bin/dlcldr.prx
+        path: |
+          ${{ github.workspace }}/prx_src/bin/dlcldr.prx
+          ${{ github.workspace }}/prx_src/bin/dlcldr_unsigned.elf
