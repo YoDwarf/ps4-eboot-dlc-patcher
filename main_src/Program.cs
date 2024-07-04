@@ -60,7 +60,7 @@ internal class Program
             ConsoleUi.LogError(((Exception)a.ExceptionObject).Message);
             AnsiConsole.WriteLine("Press any key to exit...");
             Console.ReadKey();
-            Environment.Exit(-1);
+            Environment.Exit(1);
         };
 
         AnsiConsole.Write(new Panel(new Markup("[b]PS4 EBOOT DLC Patcher[/]").Centered()) { Border = BoxBorder.Rounded }.Expand());
