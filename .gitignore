@@ -13,3 +13,5 @@
 *.sln
 
 **/ignore/
+
+**/publish/
