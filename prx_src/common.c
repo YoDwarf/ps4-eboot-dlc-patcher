@@ -1,8 +1,8 @@
 #include "common.h"
 
 // injected by main script
-int32_t DEBUG_MODE = -1;
-int32_t addcont_count = -1;
+int32_t DEBUG_MODE = 0;
+int32_t addcont_count = 1;
 dlcldr_struct addcontInfo[SCE_APP_CONTENT_INFO_LIST_MAX_SIZE] = {
     {{"0000000000000000"}, 4, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}},
 };
