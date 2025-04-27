@@ -424,9 +424,9 @@ internal static class PrxLoaderStuff
     }
 
     // these are offsets in the SIGNED prx
-    private const int DLCLDR_PRX_DEBUG_MODE_OFFSET = 0x148C0;
-    private const int DLCLDR_PRX_ADDCONT_COUNT_OFFSET = 0x148C4;
-    private const int DLCLDR_PRX_ADDCONT_LIST_OFFSET = 0x148D0;
+    private const int DLCLDR_PRX_DEBUG_MODE_OFFSET = 0x87A0;
+    private const int DLCLDR_PRX_ADDCONT_COUNT_OFFSET = 0x87A4;
+    private const int DLCLDR_PRX_ADDCONT_LIST_OFFSET = 0x87B0;
     internal static List<(ulong offset, byte[] newBytes, string description)> GetAllPatchesForSignedDlcldrPrx(IReadOnlyList<DlcInfo> dlcList, int debugMode = 0)
     {
         var patches = new List<(ulong offset, byte[] newBytes, string description)>();
