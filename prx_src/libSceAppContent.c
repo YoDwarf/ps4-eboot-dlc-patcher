@@ -151,7 +151,7 @@ int32_t dlcldr_sceAppContentAddcontMount(
 
 		// the asm handler uses 2 digits for less code
 		// and also to avoid changing the naming convention
-		snprintf(mountPoint->data, SCE_APP_CONTENT_MOUNTPOINT_DATA_MAXSIZE, "/data", i);
+		snprintf(mountPoint->data, SCE_APP_CONTENT_MOUNTPOINT_DATA_MAXSIZE, "/data");
 
 		Logf_if_enabled("[dlcldr] dlcldr_sceAppContentAddcontMount mounted %s at %s", entitlementLabel->data, mountPoint->data);
 		return 0;
