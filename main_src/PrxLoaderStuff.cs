@@ -48,7 +48,7 @@ internal static class PrxLoaderStuff
 
     private const string newModuleAndLibraryName = "dlcldr";
     private const string fakeAppContentFunctionPrefix = "dlcldr_";
-    internal static async Task<List<(ulong offset, byte[] newBytes, string description)>> GetAllPatchesForExec(Ps4ModuleLoader.Ps4Binary binary, FileStream fs, int freeSpaceAtEnd, int fileOffsetOfFreeSpaceStart, ulong sceKernelLoadStartModuleFunctionEntryFileOffset, bool patchAppContent, bool patchEntitlementAcces)
+    internal static async Task<List<(ulong offset, byte[] newBytes, string description)>> GetAllPatchesForExec(Ps4ModuleLoader.Ps4Binary binary, Stream inputExecStream, int freeSpaceAtEnd, int fileOffsetOfFreeSpaceStart, ulong sceKernelLoadStartModuleFunctionEntryFileOffset, bool patchAppContent, bool patchEntitlementAcces)
     {
         if (!patchAppContent && !patchEntitlementAcces)
         { throw new UnreachableException("No patches selected"); }
@@ -96,8 +96,8 @@ internal static class PrxLoaderStuff
         // https://www.psdevwiki.com/ps5/Libraries
         (string symbol, ulong? funcPtr, List<(Instruction instruction, uint rdiImm)> xrefs) sceSysmoduleLoadModuleXRefs = ("sceSysmoduleLoadModule", binary.Relocations.SingleOrDefault(x => x.SYMBOL is not null && x.SYMBOL.StartsWith(Ps4ModuleLoader.Utils.CalculateNidForSymbol("sceSysmoduleLoadModule")))?.REAL_FUNCTION_ADDRESS, new());
 
-        var reader = new StreamCodeReader(fs);
-        fs.Seek((long)codeSegment.OFFSET, SeekOrigin.Begin);
+        var reader = new StreamCodeReader(inputExecStream);
+        inputExecStream.Seek((long)codeSegment.OFFSET, SeekOrigin.Begin);
 
         var decoder = Iced.Intel.Decoder.Create(64, reader);
         decoder.IP = codeSegment.MEM_ADDR;
@@ -229,7 +229,7 @@ internal static class PrxLoaderStuff
                     {
                         throw new UnreachableException("Unknown opcode");
                     }
-                    patches.Add(((xref.IP - codeSegment.MEM_ADDR) + codeSegment.OFFSET, newBytes, "patch out call to sceAppContentInitialize"));
+                    patches.Add(((xref.IP - codeSegment.MEM_ADDR) + codeSegment.OFFSET, newBytes, "Patch out call to sceAppContentInitialize"));
                 }
 
             }
@@ -288,7 +288,7 @@ internal static class PrxLoaderStuff
                     {
                         throw new UnreachableException("Unknown opcode");
                     }
-                    patches.Add(((xref.IP - codeSegment.MEM_ADDR) + codeSegment.OFFSET, newBytes, "patch out call to sceNpEntitlementAccessInitialize"));
+                    patches.Add(((xref.IP - codeSegment.MEM_ADDR) + codeSegment.OFFSET, newBytes, "Patch out call to sceNpEntitlementAccessInitialize"));
                 }
 
             }
@@ -416,7 +416,7 @@ internal static class PrxLoaderStuff
         var ns = typeof(Program).Namespace;
         using var stream = assembly.GetManifestResourceStream($"{ns}.dlcldr.prx");
         using var fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        stream.CopyTo(fs);
+        stream!.CopyTo(fs);
         fs.Flush();
 #if DEBUG
         ConsoleUi.LogInfo($"Saved unpatched dlcldr.prx to {outputPath}");
@@ -424,10 +424,10 @@ internal static class PrxLoaderStuff
     }
 
     // these are offsets in the SIGNED prx
-    private const int DLCLDR_PRX_DEBUG_MODE_OFFSET = 0x148D0;
-    private const int DLCLDR_PRX_ADDCONT_COUNT_OFFSET = 0x148D4;
-    private const int DLCLDR_PRX_ADDCONT_LIST_OFFSET = 0x148E0;
-    internal static List<(ulong offset, byte[] newBytes, string description)> GetAllPatchesForSignedDlcldrPrx(List<DlcInfo> dlcList, int debugMode = 0)
+    private const int DLCLDR_PRX_DEBUG_MODE_OFFSET = 0x148C0;
+    private const int DLCLDR_PRX_ADDCONT_COUNT_OFFSET = 0x148C4;
+    private const int DLCLDR_PRX_ADDCONT_LIST_OFFSET = 0x148D0;
+    internal static List<(ulong offset, byte[] newBytes, string description)> GetAllPatchesForSignedDlcldrPrx(IReadOnlyList<DlcInfo> dlcList, int debugMode = 0)
     {
         var patches = new List<(ulong offset, byte[] newBytes, string description)>();
 

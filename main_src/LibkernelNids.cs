@@ -4,6 +4,8 @@ internal class LibkernelNids
     // the libkernel module contains multiple libraries, but we can only use the NIDs from the main libkernel library
     // TODO: Since the module loader now parses the library ids correctly, we could filter by that and not need this
     private static readonly List<string> libkernelSymbols = [
+        "__stack_chk_guard",
+        "__stack_chk_fail",
         "sceKernelAddCpumodeEvent",
         "sceKernelAddFileEvent",
         "sceKernelAddGpuExceptionEvent",

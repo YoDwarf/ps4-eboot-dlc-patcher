@@ -40,7 +40,7 @@ int32_t dlcldr_sceAppContentGetAddcontInfoList(
 			return SCE_APP_CONTENT_ERROR_PARAMETER;
 		}
 		*hitNum = addcont_count;
-		Logf_if_enabled("[dlcldr] sceNpEntitlementAccessGetAddcontEntitlementInfoList: list is null or listNum is 0, hitNum set to %d", addcont_count);
+		Logf_if_enabled("[dlcldr] dlcldr_sceAppContentGetAddcontInfoList: list is null or listNum is 0, hitNum set to %d", addcont_count);
 		return SCE_OK;
 	}
 

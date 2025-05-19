@@ -1,0 +1,67 @@
+name: Build prx
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+    paths:
+      - 'prx_src/**'
+      - '.github/workflows/prx.yml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  attestations: write
+  contents: read
+
+env:
+  OO_PS4_TOOLCHAIN: /opt/OpenOrbis-PS4-Toolchain
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install OpenOrbis deps
+      run: |
+        sudo apt update
+        sudo apt install -y clang lld golang
+
+    - name: Setup OpenOrbis-PS4-Toolchain
+      run: |
+        mkdir -p $OO_PS4_TOOLCHAIN
+        curl -L 'https://github.com/OpenOrbis/OpenOrbis-PS4-Toolchain/releases/download/v0.5.2/v0.5.2.tar.gz' | tar -xz --strip-components=2 -C $OO_PS4_TOOLCHAIN OpenOrbis/PS4Toolchain
+    
+    - name: Build create-fself # The create-fself version bundled with OO_PS4_TOOLCHAIN seems to be from before OELFStrangeLibs was added, which we need to be able to use libSceAppContent
+      run: |
+        temp_dir=$RUNNER_TEMP/create-fself
+        git clone https://github.com/OpenOrbis/create-fself.git $temp_dir
+        cd $temp_dir/cmd/create-fself
+        go build -o create-fself -modfile=go-linux.mod
+        mkdir -p ${OO_PS4_TOOLCHAIN}/bin/linux
+        mv ./create-fself ${OO_PS4_TOOLCHAIN}/bin/linux/create-fself
+
+    - name: Build prx
+      run: |
+        cd ${{ github.workspace }}/prx_src
+        chmod +x build.sh
+        ./build.sh
+
+    - name: Attest Build
+      uses: actions/attest-build-provenance@v1
+      with:
+        subject-path: |
+          ${{ github.workspace }}/prx_src/bin/dlcldr.prx
+          ${{ github.workspace }}/prx_src/bin/dlcldr_unsigned.elf
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dlcldr
+        path: |
+          ${{ github.workspace }}/prx_src/bin/dlcldr.prx
+          ${{ github.workspace }}/prx_src/bin/dlcldr_unsigned.elf

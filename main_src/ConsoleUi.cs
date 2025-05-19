@@ -31,13 +31,13 @@ internal class ConsoleUi
 
     public static bool Confirm(string message)
     {
-        return AnsiConsole.Confirm(message);
+        return AnsiConsole.Confirm(Markup.Escape(message));
     }
 
     public static List<string> MultilineInput(string message)
     {
         AnsiConsole.MarkupLineInterpolated($"[yellow]{message}[/]");
-        AnsiConsole.MarkupLine($"Press enter on an empty line to finish");
+        AnsiConsole.MarkupLine($"[green]Press enter on an empty line to finish[/]");
 
         List<string> lines = new();
         while (true)

@@ -7,7 +7,7 @@ using System.Text;
 namespace ps4_eboot_dlc_patcher;
 internal static class InExecutableLoaderStuff
 {
-    internal static async Task<List<(ulong offset, byte[] newBytes, string description)>> GetAllInEbootPatchesForExec(Ps4ModuleLoader.Ps4Binary binary, FileStream fs, int freeSpaceAtEnd, int fileOffsetOfFreeSpaceStart, List<DlcInfo> dlcList)
+    internal static async Task<List<(ulong offset, byte[] newBytes, string description)>> GetAllInEbootPatchesForExec(Ps4ModuleLoader.Ps4Binary binary, Stream inputExecStream, int freeSpaceAtEnd, int fileOffsetOfFreeSpaceStart, IReadOnlyList<DlcInfo> dlcList)
     {
         if (dlcList.Any(x => x.EntitlementKey.Any(keyByte => keyByte != 0x0)))
         {
@@ -77,8 +77,8 @@ internal static class InExecutableLoaderStuff
 
         var codeSegment = binary.E_SEGMENTS.First(x => x.GetName() == "CODE"); // throws if not found
 
-        var reader = new StreamCodeReader(fs);
-        fs.Seek((long)codeSegment.OFFSET, SeekOrigin.Begin);
+        var reader = new StreamCodeReader(inputExecStream);
+        inputExecStream.Seek((long)codeSegment.OFFSET, SeekOrigin.Begin);
 
         var decoder = Iced.Intel.Decoder.Create(64, reader);
         decoder.IP = codeSegment.MEM_ADDR;

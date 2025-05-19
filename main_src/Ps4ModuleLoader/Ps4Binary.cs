@@ -29,7 +29,7 @@ public class Ps4Binary
     public ushort E_SHT_INDEX { get; private set; }
 
     public List<Segment> E_SEGMENTS { get; private set; }
-    public List<Section> E_SECTIONS { get; private set; }
+    //public List<Section> E_SECTIONS { get; private set; }
     public Dictionary<string, ulong> Dynamic { get; private set; } = new();
     public Dictionary<int, object> Stubs { get; private set; } = new();
     public Dictionary<int, (int id, string? name, ulong? stringFileOffset)> Modules { get; private set; } = new();
@@ -241,8 +241,8 @@ public class Ps4Binary
                         {
                             if (Symbols[i].Key == key)
                             {
-                                Symbols[i].Value.NID = symbol;
-                                Symbols[i].Value.NID_FILE_ADDRESS = location2 + (ulong)key;
+                                Symbols[i].Value!.NID = symbol;
+                                Symbols[i].Value!.NID_FILE_ADDRESS = location2 + (ulong)key;
                             }
 
                         }
@@ -263,7 +263,7 @@ public class Ps4Binary
                     var entryCount = (int)((Dynamic["SYMTABSZ"] - 0x30) / 0x18);
                     for (int entry = 0; entry < entryCount; entry++)
                     {
-                        new Symbol(reader).Resolve(location + (ulong)(entry * 0x18), symbols[entry].Value.NID);
+                        new Symbol(reader).Resolve(location + (ulong)(entry * 0x18), symbols[entry].Value!.NID!);
                     }
                 }
                 catch (Exception)
